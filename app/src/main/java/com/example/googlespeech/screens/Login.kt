@@ -37,10 +37,14 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.googlespeech.R
 import com.example.googlespeech.api.config.ApiClient
+import com.example.googlespeech.api.models.auth.LoginResponse
 import com.example.googlespeech.components.AuthOption
 import com.example.googlespeech.components.TextField
 import com.example.googlespeech.utils.Routes
 import kotlinx.coroutines.launch
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 
 @Composable
 fun LoginScreen(navController: NavController, modifier: Modifier = Modifier) {
@@ -107,16 +111,33 @@ fun LoginScreen(navController: NavController, modifier: Modifier = Modifier) {
             onClick = {
                 coroutineScope.launch {
                     try {
-                        val response =
-                            ApiClient.loginService.androidLogin(email.value, password.value)
-                                .execute()
-                        if (response.isSuccessful) {
-                            val loginResponse = response.body()
-                            Log.d("Login", "Login berhasil: ${loginResponse?.detail}")
-                            loginResponse?.let { saveToken(context, it.accessToken) }
-                        } else {
-                            Log.e("Login", "Login gagal: ${response.errorBody()?.string()}")
-                        }
+                        ApiClient.loginService.androidLogin(email.value, password.value)
+                            .enqueue(object : Callback<LoginResponse> {
+                                override fun onResponse(
+                                    call: Call<LoginResponse>,
+                                    response: Response<LoginResponse>,
+                                ) {
+                                    if (response.isSuccessful) {
+                                        val loginResponse = response.body()
+                                        Log.d(
+                                            "Login",
+                                            "Login berhasil! Token: ${loginResponse?.accessToken}"
+                                        )
+                                        saveToken(context, loginResponse?.accessToken ?: "")
+//                                    navController.navigate(Routes.HOME)
+                                        Log.d("Token", "Token: ${getAccessToken(context)}")
+                                    } else {
+                                        Log.e(
+                                            "Login",
+                                            "Gagal login: ${response.errorBody()?.string()}"
+                                        )
+                                    }
+                                }
+
+                                override fun onFailure(call: Call<LoginResponse>, t: Throwable) {
+                                    Log.e("Login", "Error: ${t.message}")
+                                }
+                            })
                     } catch (e: Exception) {
                         Log.e("Login", "Error: ${e.message}")
                     }
