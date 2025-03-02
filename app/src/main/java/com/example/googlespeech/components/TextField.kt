@@ -21,6 +21,8 @@ import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
@@ -42,6 +44,7 @@ fun TextField(
     isPassword: Boolean = false,
     onLeadingClick: () -> Unit = {},
     onTrailingClick: () -> Unit = {},
+    onTextChanged: (String) -> Unit,
 ) {
     if (isPassword) {
         PasswordTextField(
@@ -52,7 +55,8 @@ fun TextField(
             textFieldState = textFieldState,
             hint = hint,
             onLeadingClick = onLeadingClick,
-            onTrailingClick = onTrailingClick
+            onTrailingClick = onTrailingClick,
+            onTextChanged = onTextChanged
         )
     } else {
         TextTextField(
@@ -64,7 +68,8 @@ fun TextField(
             hint = hint,
             keyboardType = keyboardType,
             onLeadingClick = onLeadingClick,
-            onTrailingClick = onTrailingClick
+            onTrailingClick = onTrailingClick,
+            onTextChanged = onTextChanged
         )
     }
 }
@@ -80,7 +85,10 @@ fun TextTextField(
     keyboardType: KeyboardType = KeyboardType.Text,
     onLeadingClick: () -> Unit = {},
     onTrailingClick: () -> Unit = {},
+    onTextChanged: (String) -> Unit,
 ) {
+    val previousText = remember { mutableStateOf(textFieldState.text) }
+
     BasicTextField(state = textFieldState,
         textStyle = LocalTextStyle.current.copy(
             color = MaterialTheme.colorScheme.onBackground
@@ -115,6 +123,10 @@ fun TextTextField(
                         }
 
                         innerTextField()
+                        if (previousText.value != textFieldState.text) {
+                            previousText.value = textFieldState.text
+                            onTextChanged(textFieldState.text.toString())
+                        }
                     }
 
                     if (trailingIcon != null) {
@@ -151,7 +163,10 @@ fun PasswordTextField(
     hint: String,
     onLeadingClick: () -> Unit = {},
     onTrailingClick: () -> Unit = {},
+    onTextChanged: (String) -> Unit,
 ) {
+    val previousText = remember { mutableStateOf(textFieldState.text) }
+
     BasicSecureTextField(state = textFieldState,
         textObfuscationMode = TextObfuscationMode.Hidden,
         textStyle = LocalTextStyle.current.copy(
@@ -185,6 +200,10 @@ fun PasswordTextField(
                         }
 
                         innerTextField()
+                        if (previousText.value != textFieldState.text) {
+                            previousText.value = textFieldState.text
+                            onTextChanged(textFieldState.text.toString())
+                        }
                     }
 
                     if (trailingIcon != null) {

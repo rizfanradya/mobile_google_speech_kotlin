@@ -1,5 +1,7 @@
 package com.example.googlespeech.screens
 
+import android.content.Context
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -19,10 +21,14 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
@@ -30,12 +36,32 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.googlespeech.R
+import com.example.googlespeech.api.config.ApiClient
 import com.example.googlespeech.components.AuthOption
 import com.example.googlespeech.components.TextField
 import com.example.googlespeech.utils.Routes
+import kotlinx.coroutines.launch
 
 @Composable
 fun LoginScreen(navController: NavController, modifier: Modifier = Modifier) {
+    val coroutineScope = rememberCoroutineScope()
+    val context = LocalContext.current
+    val email = remember { mutableStateOf("") }
+    val password = remember { mutableStateOf("") }
+    val emailState = remember { TextFieldState() }
+    val passwordState = remember { TextFieldState() }
+
+    fun saveToken(context: Context, token: String) {
+        val sharedPreferences = context.getSharedPreferences("auth_prefs", Context.MODE_PRIVATE)
+        sharedPreferences.edit().putString("access_token", token).apply()
+    }
+
+    fun getAccessToken(context: Context): String? {
+        val sharedPreferences = context.getSharedPreferences("auth_prefs", Context.MODE_PRIVATE)
+        return sharedPreferences.getString("access_token", null)
+    }
+
+
     Column(
         modifier = modifier
             .fillMaxSize()
@@ -60,25 +86,42 @@ fun LoginScreen(navController: NavController, modifier: Modifier = Modifier) {
         }
 
         TextField(
-            textFieldState = TextFieldState(),
+            textFieldState = emailState,
             hint = "Email",
             leadingIcon = Icons.Outlined.Email,
             trailingIcon = Icons.Outlined.Check,
             keyboardType = KeyboardType.Email,
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth(),
+            onTextChanged = { email.value = it },
         )
 
-        TextField(
-            textFieldState = TextFieldState(),
+        TextField(textFieldState = passwordState,
             hint = "Password",
             leadingIcon = Icons.Outlined.Lock,
             trailingText = "Forgot?",
             isPassword = true,
-            modifier = Modifier.fillMaxWidth()
-        )
+            modifier = Modifier.fillMaxWidth(),
+            onTextChanged = { password.value = it })
 
         Button(
-            onClick = { }, modifier = Modifier.fillMaxWidth()
+            onClick = {
+                coroutineScope.launch {
+                    try {
+                        val response =
+                            ApiClient.loginService.androidLogin(email.value, password.value)
+                                .execute()
+                        if (response.isSuccessful) {
+                            val loginResponse = response.body()
+                            Log.d("Login", "Login berhasil: ${loginResponse?.detail}")
+                            loginResponse?.let { saveToken(context, it.accessToken) }
+                        } else {
+                            Log.e("Login", "Login gagal: ${response.errorBody()?.string()}")
+                        }
+                    } catch (e: Exception) {
+                        Log.e("Login", "Error: ${e.message}")
+                    }
+                }
+            }, modifier = Modifier.fillMaxWidth()
         ) {
             Text(
                 text = "Login", fontSize = 17.sp, modifier = Modifier.padding(vertical = 8.dp)

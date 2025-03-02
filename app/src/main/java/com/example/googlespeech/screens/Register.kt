@@ -54,7 +54,7 @@ fun RegisterScreen(navController: NavController, modifier: Modifier = Modifier) 
     val emailState = remember { TextFieldState() }
     val fullNameState = remember { TextFieldState() }
     val passwordState = remember { TextFieldState() }
-    
+
     Column(
         modifier = modifier
             .fillMaxSize()
