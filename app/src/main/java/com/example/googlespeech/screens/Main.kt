@@ -13,5 +13,6 @@ fun MainScreen() {
     NavHost(navController = navController, startDestination = Routes.LOGIN) {
         composable(Routes.LOGIN) { LoginScreen(navController) }
         composable(Routes.REGISTER) { RegisterScreen(navController) }
+        composable(Routes.HOME) { HomeScreen(navController) }
     }
 }
