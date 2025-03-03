@@ -26,6 +26,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
@@ -45,6 +46,7 @@ fun TextField(
     onLeadingClick: () -> Unit = {},
     onTrailingClick: () -> Unit = {},
     onTextChanged: (String) -> Unit,
+    isError: Boolean = false,
 ) {
     if (isPassword) {
         PasswordTextField(
@@ -56,7 +58,8 @@ fun TextField(
             hint = hint,
             onLeadingClick = onLeadingClick,
             onTrailingClick = onTrailingClick,
-            onTextChanged = onTextChanged
+            onTextChanged = onTextChanged,
+            isError = isError,
         )
     } else {
         TextTextField(
@@ -69,7 +72,8 @@ fun TextField(
             keyboardType = keyboardType,
             onLeadingClick = onLeadingClick,
             onTrailingClick = onTrailingClick,
-            onTextChanged = onTextChanged
+            onTextChanged = onTextChanged,
+            isError = isError,
         )
     }
 }
@@ -86,12 +90,14 @@ fun TextTextField(
     onLeadingClick: () -> Unit = {},
     onTrailingClick: () -> Unit = {},
     onTextChanged: (String) -> Unit,
+    isError: Boolean = false,
 ) {
     val previousText = remember { mutableStateOf(textFieldState.text) }
+    val textColor = if (isError) Color.Red else MaterialTheme.colorScheme.onBackground
 
     BasicTextField(state = textFieldState,
         textStyle = LocalTextStyle.current.copy(
-            color = MaterialTheme.colorScheme.onBackground
+            color = textColor
         ),
         keyboardOptions = KeyboardOptions(keyboardType = keyboardType),
         lineLimits = TextFieldLineLimits.SingleLine,
@@ -164,13 +170,15 @@ fun PasswordTextField(
     onLeadingClick: () -> Unit = {},
     onTrailingClick: () -> Unit = {},
     onTextChanged: (String) -> Unit,
+    isError: Boolean = false,
 ) {
     val previousText = remember { mutableStateOf(textFieldState.text) }
+    val textColor = if (isError) Color.Red else MaterialTheme.colorScheme.onBackground
 
     BasicSecureTextField(state = textFieldState,
         textObfuscationMode = TextObfuscationMode.Hidden,
         textStyle = LocalTextStyle.current.copy(
-            color = MaterialTheme.colorScheme.onBackground
+            color = textColor
         ),
         cursorBrush = SolidColor(MaterialTheme.colorScheme.primary),
         modifier = modifier,

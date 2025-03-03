@@ -1,6 +1,6 @@
 package com.example.googlespeech.screens
 
-import android.util.Log
+import android.util.Patterns
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.AccountCircle
@@ -18,6 +19,7 @@ import androidx.compose.material.icons.outlined.Check
 import androidx.compose.material.icons.outlined.Email
 import androidx.compose.material.icons.outlined.Lock
 import androidx.compose.material3.Button
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -27,6 +29,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -38,9 +41,14 @@ import com.example.googlespeech.R
 import com.example.googlespeech.api.config.ApiClient
 import com.example.googlespeech.api.models.user.CreateUserModel
 import com.example.googlespeech.components.AuthOption
+import com.example.googlespeech.components.ErrorDialog
 import com.example.googlespeech.components.TextField
 import com.example.googlespeech.utils.Routes
+import com.example.googlespeech.utils.isValidEmail
+import com.example.googlespeech.utils.isValidFullName
+import com.example.googlespeech.utils.isValidPassword
 import kotlinx.coroutines.launch
+import org.json.JSONObject
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -54,6 +62,21 @@ fun RegisterScreen(navController: NavController, modifier: Modifier = Modifier) 
     val emailState = remember { TextFieldState() }
     val fullNameState = remember { TextFieldState() }
     val passwordState = remember { TextFieldState() }
+    val emailError = remember { mutableStateOf("") }
+    val fullNameError = remember { mutableStateOf("") }
+    val passwordError = remember { mutableStateOf("") }
+    val isLoading = remember { mutableStateOf(false) }
+    val showDialog = remember { mutableStateOf(false) }
+    val errorMessage = remember { mutableStateOf("") }
+
+    val isFormValid =
+        emailError.value.isEmpty() && passwordError.value.isEmpty() && email.value.isNotEmpty() && password.value.isNotEmpty()
+
+    if (showDialog.value) {
+        ErrorDialog(showDialog.value, errorMessage.value) {
+            showDialog.value = false
+        }
+    }
 
     Column(
         modifier = modifier
@@ -96,26 +119,64 @@ fun RegisterScreen(navController: NavController, modifier: Modifier = Modifier) 
                 .alpha(0.5f)
         )
 
-        TextField(textFieldState = emailState,
-            hint = "Email",
-            leadingIcon = Icons.Outlined.Email,
-            trailingIcon = Icons.Outlined.Check,
-            keyboardType = KeyboardType.Email,
-            modifier = Modifier.fillMaxWidth(),
-            onTextChanged = { email.value = it })
+        Column(modifier = Modifier.fillMaxWidth()) {
+            TextField(
+                textFieldState = emailState,
+                hint = "Email",
+                leadingIcon = Icons.Outlined.Email,
+                trailingIcon = Icons.Outlined.Check,
+                keyboardType = KeyboardType.Email,
+                modifier = Modifier.fillMaxWidth(),
+                onTextChanged = {
+                    email.value = it
+                    emailError.value = if (isValidEmail(it)) "" else "Invalid email"
+                },
+                isError = emailError.value.isNotEmpty()
+            )
+            if (emailError.value.isNotEmpty()) {
+                Spacer(modifier = Modifier.height(4.dp))
+                Text(text = emailError.value, color = Color.Red, fontSize = 12.sp)
+            }
+        }
 
-        TextField(textFieldState = fullNameState,
-            hint = "Full Name",
-            leadingIcon = Icons.Outlined.AccountCircle,
-            modifier = Modifier.fillMaxWidth(),
-            onTextChanged = { fullName.value = it })
+        Column(modifier = Modifier.fillMaxWidth()) {
+            TextField(
+                textFieldState = fullNameState,
+                hint = "Full Name",
+                leadingIcon = Icons.Outlined.AccountCircle,
+                modifier = Modifier.fillMaxWidth(),
+                onTextChanged = {
+                    fullName.value = it
+                    fullNameError.value =
+                        if (isValidFullName(it)) "" else "Full name cannot be empty"
+                },
+                isError = fullNameError.value.isNotEmpty()
+            )
+            if (fullNameError.value.isNotEmpty()) {
+                Spacer(modifier = Modifier.height(4.dp))
+                Text(text = fullNameError.value, color = Color.Red, fontSize = 12.sp)
+            }
+        }
 
-        TextField(textFieldState = passwordState,
-            hint = "Password",
-            leadingIcon = Icons.Outlined.Lock,
-            isPassword = true,
-            modifier = Modifier.fillMaxWidth(),
-            onTextChanged = { password.value = it })
+        Column(modifier = Modifier.fillMaxWidth()) {
+            TextField(
+                textFieldState = passwordState,
+                hint = "Password",
+                leadingIcon = Icons.Outlined.Lock,
+                isPassword = true,
+                modifier = Modifier.fillMaxWidth(),
+                onTextChanged = {
+                    password.value = it
+                    passwordError.value =
+                        if (isValidPassword(it)) "" else "Password must be at least 8 characters, include uppercase, lowercase, a number, and a special character"
+                },
+                isError = passwordError.value.isNotEmpty()
+            )
+            if (passwordError.value.isNotEmpty()) {
+                Spacer(modifier = Modifier.height(4.dp))
+                Text(text = passwordError.value, color = Color.Red, fontSize = 12.sp)
+            }
+        }
 
         Button(
             onClick = {
@@ -128,24 +189,57 @@ fun RegisterScreen(navController: NavController, modifier: Modifier = Modifier) 
                                     call: Call<Void>,
                                     response: Response<Void>,
                                 ) {
+                                    isLoading.value = false
                                     if (response.isSuccessful) {
                                         navController.navigate(Routes.LOGIN)
+                                    } else {
+                                        val errorBody = response.errorBody()?.string()
+                                        errorMessage.value = try {
+                                            if (!errorBody.isNullOrEmpty()) {
+                                                val jsonObj = JSONObject(errorBody)
+                                                val detail = jsonObj.optJSONObject("detail")
+                                                when {
+                                                    detail?.has("message") == true -> detail.getString(
+                                                        "message"
+                                                    )
+
+                                                    detail?.has("detail") == true -> detail.getString(
+                                                        "detail"
+                                                    )
+
+                                                    else -> "An error occurred."
+                                                }
+                                            } else "An error occurred."
+                                        } catch (e: Exception) {
+                                            "An error occurred."
+                                        }
+                                        showDialog.value = true
                                     }
                                 }
 
                                 override fun onFailure(call: Call<Void>, t: Throwable) {
-                                    Log.e("Register", "Error: ${t.message}")
+                                    isLoading.value = false
+                                    errorMessage.value = "Failed to connect to the server"
+                                    showDialog.value = true
                                 }
                             })
                     } catch (e: Exception) {
-                        Log.e("Register", "Error: ${e.message}")
+                        isLoading.value = false
+                        errorMessage.value = "An error occurred: ${e.message}"
+                        showDialog.value = true
                     }
                 }
-            }, modifier = Modifier.fillMaxWidth()
+            }, modifier = Modifier.fillMaxWidth(), enabled = isFormValid && !isLoading.value
         ) {
-            Text(
-                text = "Register", fontSize = 17.sp, modifier = Modifier.padding(vertical = 8.dp)
-            )
+            if (isLoading.value) {
+                CircularProgressIndicator(color = Color.White, modifier = Modifier.size(20.dp))
+            } else {
+                Text(
+                    text = "Register",
+                    fontSize = 17.sp,
+                    modifier = Modifier.padding(vertical = 8.dp)
+                )
+            }
         }
 
 
