@@ -25,6 +25,7 @@ import androidx.navigation.NavController
 import com.example.googlespeech.components.UserGuard
 import androidx.constraintlayout.compose.ConstraintLayout
 import com.example.googlespeech.R
+import com.example.googlespeech.utils.decodeJWT
 import com.example.googlespeech.utils.getAccessToken
 import com.example.googlespeech.utils.logout
 
@@ -33,6 +34,9 @@ fun ProfileScreen(navController: NavController) {
     UserGuard(navController) {
         val context = LocalContext.current
         val token = getAccessToken(context)
+        val userData = decodeJWT(token)
+        val firstName = userData?.get("first_name") as? String ?: "Guest"
+        val email = userData?.get("email") as? String ?: "guest@example.com"
 
         Column(
             Modifier
@@ -71,25 +75,28 @@ fun ProfileScreen(navController: NavController) {
                     start.linkTo(parent.start)
                     end.linkTo(parent.end)
                 })
-                Image(painterResource(id = R.drawable.back), null, Modifier.constrainAs(back) {
-                    top.linkTo(parent.top, margin = 24.dp)
-                    start.linkTo(parent.start, margin = 24.dp)
-
-                })
+                Image(painter = painterResource(id = R.drawable.back),
+                    contentDescription = "Back",
+                    modifier = Modifier
+                        .constrainAs(back) {
+                            top.linkTo(parent.top, margin = 24.dp)
+                            start.linkTo(parent.start, margin = 24.dp)
+                        }
+                        .clickable { navController.popBackStack() })
                 Image(painterResource(id = R.drawable.write), null, Modifier.constrainAs(pen) {
                     top.linkTo(profile.top)
                     start.linkTo(profile.end)
                 })
             }
             Text(
-                text = "Alex Flores",
+                text = firstName,
                 fontSize = 26.sp,
                 fontWeight = FontWeight.Bold,
                 modifier = Modifier.padding(top = 16.dp),
                 color = Color(android.graphics.Color.parseColor("#32357a"))
             )
             Text(
-                text = "alexflores@gmail.com",
+                text = email,
                 fontSize = 18.sp,
                 color = Color(android.graphics.Color.parseColor("#747679"))
             )

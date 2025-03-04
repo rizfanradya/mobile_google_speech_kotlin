@@ -20,7 +20,7 @@ import com.example.googlespeech.utils.getAccessToken
 @Composable
 fun HomeScreen(navController: NavController, modifier: Modifier = Modifier) {
     UserGuard(navController) {
-        val context = LocalContext.current
+//        val context = LocalContext.current
 
         Column(
             modifier = modifier
@@ -31,11 +31,11 @@ fun HomeScreen(navController: NavController, modifier: Modifier = Modifier) {
             Text(
                 text = "Home Screen", fontWeight = FontWeight.SemiBold, fontSize = 30.sp
             )
-            Text(
-                text = "TOKEN : ${getAccessToken(context)}",
-                fontWeight = FontWeight.SemiBold,
-                fontSize = 30.sp
-            )
+//            Text(
+//                text = "TOKEN : ${getAccessToken(context)}",
+//                fontWeight = FontWeight.SemiBold,
+//                fontSize = 30.sp
+//            )
         }
     }
 }
