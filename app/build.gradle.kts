@@ -58,4 +58,5 @@ dependencies {
     implementation(libs.androidx.navigation)
     implementation(libs.retrofit)
     implementation(libs.retrofit.gson)
+    implementation(libs.constraintlayout.compose)
 }

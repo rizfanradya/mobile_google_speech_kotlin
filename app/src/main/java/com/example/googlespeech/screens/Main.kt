@@ -6,6 +6,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.example.googlespeech.components.BottomNavBar
 import com.example.googlespeech.utils.Routes
@@ -13,8 +14,15 @@ import com.example.googlespeech.utils.Routes
 @Composable
 fun MainScreen() {
     val navController = rememberNavController()
+    val currentBackStackEntryState = navController.currentBackStackEntryAsState()
+    val currentRoute = currentBackStackEntryState.value?.destination?.route
+    val hideBottomBar = currentRoute == Routes.LOGIN || currentRoute == Routes.REGISTER
 
-    Scaffold(bottomBar = { BottomNavBar(navController) }) { paddingValues ->
+    Scaffold(bottomBar = {
+        if (!hideBottomBar) {
+            BottomNavBar(navController)
+        }
+    }) { paddingValues ->
         NavHost(
             navController = navController,
             startDestination = Routes.HOME,
