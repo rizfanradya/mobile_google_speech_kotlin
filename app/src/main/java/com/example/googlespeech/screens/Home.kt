@@ -32,6 +32,7 @@ import androidx.navigation.NavController
 import com.example.googlespeech.components.UserGuard
 import com.example.googlespeech.ui.theme.Purple80
 import com.example.googlespeech.R
+import androidx.core.graphics.toColorInt
 
 @Composable
 fun HomeScreen(navController: NavController, modifier: Modifier = Modifier) {
@@ -42,7 +43,7 @@ fun HomeScreen(navController: NavController, modifier: Modifier = Modifier) {
             modifier = modifier
                 .fillMaxSize()
                 .windowInsetsPadding(WindowInsets.systemBars)
-                .background(color = Color(android.graphics.Color.parseColor("#f2f1f6"))),
+                .background(color = Color("#f2f1f6".toColorInt())),
             verticalArrangement = Arrangement.Top
         ) {
             Box(
@@ -76,9 +77,7 @@ fun HomeScreen(navController: NavController, modifier: Modifier = Modifier) {
                 modifier = Modifier.padding(8.dp), verticalAlignment = Alignment.CenterVertically
             ) {
                 OutlinedTextField(
-                    modifier = Modifier.weight(1f),
-                    value = message.value,
-                    onValueChange = {
+                    modifier = Modifier.weight(1f), value = message.value, onValueChange = {
                         message.value = it
                     })
                 IconButton(onClick = {

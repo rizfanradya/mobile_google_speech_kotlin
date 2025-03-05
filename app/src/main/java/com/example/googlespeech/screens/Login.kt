@@ -242,7 +242,8 @@ fun LoginScreen(navController: NavController, modifier: Modifier = Modifier) {
                     text = "Don't have an account? ",
                     fontSize = 16.sp,
                 )
-                Text(text = "Register",
+                Text(
+                    text = "Register",
                     fontSize = 16.sp,
                     color = MaterialTheme.colorScheme.primary,
                     modifier = Modifier.clickable { navController.navigate(Routes.REGISTER) })

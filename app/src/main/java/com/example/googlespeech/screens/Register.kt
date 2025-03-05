@@ -252,7 +252,8 @@ fun RegisterScreen(navController: NavController, modifier: Modifier = Modifier) 
                     text = "Already have an account? ",
                     fontSize = 16.sp,
                 )
-                Text(text = "Login",
+                Text(
+                    text = "Login",
                     fontSize = 16.sp,
                     color = MaterialTheme.colorScheme.primary,
                     modifier = Modifier.clickable { navController.popBackStack() })

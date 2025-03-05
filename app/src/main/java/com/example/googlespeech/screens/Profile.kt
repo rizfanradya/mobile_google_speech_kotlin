@@ -28,6 +28,7 @@ import com.example.googlespeech.R
 import com.example.googlespeech.utils.decodeJWT
 import com.example.googlespeech.utils.getAccessToken
 import com.example.googlespeech.utils.logout
+import androidx.core.graphics.toColorInt
 
 @Composable
 fun ProfileScreen(navController: NavController) {
@@ -42,24 +43,26 @@ fun ProfileScreen(navController: NavController) {
             Modifier
                 .fillMaxWidth()
                 .fillMaxHeight()
-                .background(color = Color(android.graphics.Color.parseColor("#f2f1f6"))),
+                .background(color = Color("#f2f1f6".toColorInt())),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             ConstraintLayout(
                 Modifier
                     .height(250.dp)
-                    .background(color = Color(android.graphics.Color.parseColor("#32357a")))
+                    .background(color = Color("#32357a".toColorInt()))
             ) {
                 val (topImg, profile, title, back, pen) = createRefs()
 
-                Image(painterResource(id = R.drawable.arc_3),
+                Image(
+                    painterResource(id = R.drawable.arc_3),
                     null,
                     Modifier
                         .fillMaxWidth()
                         .constrainAs(topImg) {
                             bottom.linkTo(parent.bottom)
                         })
-                Image(painterResource(id = R.drawable.user_2),
+                Image(
+                    painterResource(id = R.drawable.user_2),
                     null,
                     Modifier
                         .fillMaxWidth()
@@ -68,14 +71,16 @@ fun ProfileScreen(navController: NavController) {
                             end.linkTo(parent.end)
                             bottom.linkTo(topImg.bottom)
                         })
-                Text(text = "Profile", style = TextStyle(
-                    color = Color.White, fontSize = 30.sp
-                ), modifier = Modifier.constrainAs(title) {
-                    top.linkTo(parent.top, margin = 32.dp)
-                    start.linkTo(parent.start)
-                    end.linkTo(parent.end)
-                })
-                Image(painter = painterResource(id = R.drawable.back),
+                Text(
+                    text = "Profile", style = TextStyle(
+                        color = Color.White, fontSize = 30.sp
+                    ), modifier = Modifier.constrainAs(title) {
+                        top.linkTo(parent.top, margin = 32.dp)
+                        start.linkTo(parent.start)
+                        end.linkTo(parent.end)
+                    })
+                Image(
+                    painter = painterResource(id = R.drawable.back),
                     contentDescription = "Back",
                     modifier = Modifier
                         .constrainAs(back) {
@@ -93,12 +98,10 @@ fun ProfileScreen(navController: NavController) {
                 fontSize = 26.sp,
                 fontWeight = FontWeight.Bold,
                 modifier = Modifier.padding(top = 16.dp),
-                color = Color(android.graphics.Color.parseColor("#32357a"))
+                color = Color("#32357a".toColorInt())
             )
             Text(
-                text = email,
-                fontSize = 18.sp,
-                color = Color(android.graphics.Color.parseColor("#747679"))
+                text = email, fontSize = 18.sp, color = Color("#747679".toColorInt())
             )
             Row(
                 modifier = Modifier
@@ -110,7 +113,8 @@ fun ProfileScreen(navController: NavController) {
                 Column(
                     modifier = Modifier.fillMaxHeight(), verticalArrangement = Arrangement.Center
                 ) {
-                    Image(painter = painterResource(id = R.drawable.btn_1),
+                    Image(
+                        painter = painterResource(id = R.drawable.btn_1),
                         null,
                         modifier = Modifier
                             .padding(end = 5.dp)
@@ -131,7 +135,8 @@ fun ProfileScreen(navController: NavController) {
                 Column(
                     modifier = Modifier.fillMaxHeight(), verticalArrangement = Arrangement.Center
                 ) {
-                    Image(painter = painterResource(id = R.drawable.arrow),
+                    Image(
+                        painter = painterResource(id = R.drawable.arrow),
                         null,
                         Modifier
                             .padding(end = 5.dp)
@@ -148,7 +153,8 @@ fun ProfileScreen(navController: NavController) {
                 Column(
                     modifier = Modifier.fillMaxHeight(), verticalArrangement = Arrangement.Center
                 ) {
-                    Image(painter = painterResource(id = R.drawable.btn_2),
+                    Image(
+                        painter = painterResource(id = R.drawable.btn_2),
                         null,
                         modifier = Modifier
                             .padding(end = 5.dp)
@@ -169,7 +175,8 @@ fun ProfileScreen(navController: NavController) {
                 Column(
                     modifier = Modifier.fillMaxHeight(), verticalArrangement = Arrangement.Center
                 ) {
-                    Image(painter = painterResource(id = R.drawable.arrow),
+                    Image(
+                        painter = painterResource(id = R.drawable.arrow),
                         null,
                         Modifier
                             .padding(end = 5.dp)
@@ -186,7 +193,8 @@ fun ProfileScreen(navController: NavController) {
                 Column(
                     modifier = Modifier.fillMaxHeight(), verticalArrangement = Arrangement.Center
                 ) {
-                    Image(painter = painterResource(id = R.drawable.btn_3),
+                    Image(
+                        painter = painterResource(id = R.drawable.btn_3),
                         null,
                         modifier = Modifier
                             .padding(end = 5.dp)
@@ -207,7 +215,8 @@ fun ProfileScreen(navController: NavController) {
                 Column(
                     modifier = Modifier.fillMaxHeight(), verticalArrangement = Arrangement.Center
                 ) {
-                    Image(painter = painterResource(id = R.drawable.arrow),
+                    Image(
+                        painter = painterResource(id = R.drawable.arrow),
                         null,
                         Modifier
                             .padding(end = 5.dp)
@@ -224,7 +233,8 @@ fun ProfileScreen(navController: NavController) {
                 Column(
                     modifier = Modifier.fillMaxHeight(), verticalArrangement = Arrangement.Center
                 ) {
-                    Image(painter = painterResource(id = R.drawable.btn_4),
+                    Image(
+                        painter = painterResource(id = R.drawable.btn_4),
                         null,
                         modifier = Modifier
                             .padding(end = 5.dp)
@@ -245,7 +255,8 @@ fun ProfileScreen(navController: NavController) {
                 Column(
                     modifier = Modifier.fillMaxHeight(), verticalArrangement = Arrangement.Center
                 ) {
-                    Image(painter = painterResource(id = R.drawable.arrow),
+                    Image(
+                        painter = painterResource(id = R.drawable.arrow),
                         null,
                         Modifier
                             .padding(end = 5.dp)
@@ -262,7 +273,8 @@ fun ProfileScreen(navController: NavController) {
                 Column(
                     modifier = Modifier.fillMaxHeight(), verticalArrangement = Arrangement.Center
                 ) {
-                    Image(painter = painterResource(id = R.drawable.btn_5),
+                    Image(
+                        painter = painterResource(id = R.drawable.btn_5),
                         null,
                         modifier = Modifier
                             .padding(end = 5.dp)
@@ -283,7 +295,8 @@ fun ProfileScreen(navController: NavController) {
                 Column(
                     modifier = Modifier.fillMaxHeight(), verticalArrangement = Arrangement.Center
                 ) {
-                    Image(painter = painterResource(id = R.drawable.arrow),
+                    Image(
+                        painter = painterResource(id = R.drawable.arrow),
                         null,
                         Modifier
                             .padding(end = 5.dp)
@@ -301,7 +314,8 @@ fun ProfileScreen(navController: NavController) {
                 Column(
                     modifier = Modifier.fillMaxHeight(), verticalArrangement = Arrangement.Center
                 ) {
-                    Image(painter = painterResource(id = R.drawable.btn_6),
+                    Image(
+                        painter = painterResource(id = R.drawable.btn_6),
                         null,
                         modifier = Modifier
                             .padding(end = 5.dp)
